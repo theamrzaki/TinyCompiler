@@ -8,20 +8,21 @@
         Title="MainWindow" Height="474" Width="711">
     <Grid>
 
-        <RichTextBox x:Name="input" VerticalScrollBarVisibility="Auto" 
-         AcceptsReturn="True" HorizontalAlignment="Left" Height="304" Margin="30,43,0,0"   VerticalAlignment="Top" Width="240">
+        <RichTextBox x:Name="input"  VerticalScrollBarVisibility="Auto" 
+         AcceptsReturn="True" HorizontalAlignment="Left" Height="304" Margin="30,43,0,0"   VerticalAlignment="Top" Width="240" KeyUp="input_KeyUp">
             <RichTextBox.Resources>
                 <Style TargetType="{x:Type Paragraph}">
                     <Setter Property="Margin" Value="0"/>
                 </Style>
             </RichTextBox.Resources>
-       </RichTextBox>
-        
-        <TextBox x:Name="output" HorizontalAlignment="Left" Height="304" Margin="425,43,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="239"/>
+        </RichTextBox>
+
+        <!--<TextBox x:Name="output" HorizontalAlignment="Left" Height="304" Margin="425,43,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="239"/>-->
         <Button x:Name="compile" Content="Button" HorizontalAlignment="Left" Margin="300,186,0,0" VerticalAlignment="Top" Width="75" Click="compile_Click"/>
 
         <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="30,22,0,0" TextWrapping="Wrap" Text="Input" VerticalAlignment="Top"/>
         <TextBlock x:Name="textBlock_Copy" HorizontalAlignment="Left" Margin="300,22,0,0" TextWrapping="Wrap" Text="Output" VerticalAlignment="Top"/>
+        <DataGrid x:Name="myDataGrid"  HorizontalAlignment="Left" Margin="420,43,0,0" VerticalAlignment="Top" Height="304" Width="263"/>
 
     </Grid>
 </Window>
