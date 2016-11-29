@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml.Linq;
 
 namespace Tiny
 {
@@ -147,7 +148,7 @@ namespace Tiny
                                            (input_text[i + 4] == ':') && (input_text[i + 5] == '='))
                                         {
                                             //--   output.Text += "<read>";
-                                            add_to_data_grid("reserved word" , "read");
+                                            add_to_data_grid("reserved word" , "read" , Colors.Blue);
                                             i = y + 3;
                                             color_selection(old_y, i+2, tiny_type.reserved_word);
                                             continue;
@@ -170,7 +171,7 @@ namespace Tiny
                                                    (input_text[i + 6] == ':') && (input_text[i + 7] == '='))
                                                 {
                                                     //--    output.Text += "<repeat>";
-                                                    add_to_data_grid("reserved word", "repeat");
+                                                    add_to_data_grid("reserved word", "repeat", Colors.Blue);
 
                                                     i = y + 5;
                                                     color_selection(old_y, i+3, tiny_type.reserved_word);
@@ -202,7 +203,7 @@ namespace Tiny
                                            (input_text[i + 4] == ':') && (input_text[i + 5] == '='))
                                         {
                                             //--  output.Text += "<else>";
-                                            add_to_data_grid("reserved word", "else");
+                                            add_to_data_grid("reserved word", "else", Colors.Blue);
 
                                             i = y + 3;
                                             continue;
@@ -222,7 +223,7 @@ namespace Tiny
                                        (input_text[i + 3] == ':') && (input_text[i + 4] == '='))
                                     {
                                         //--     output.Text += "<end>";
-                                        add_to_data_grid("reserved word", "end");
+                                        add_to_data_grid("reserved word", "end", Colors.Blue);
 
                                         i = y + 2;
                                         continue;
@@ -246,7 +247,7 @@ namespace Tiny
                                    (input_text[i + 2] == ':') && (input_text[i + 3] == '='))//else
                                 {
                                     //--   output.Text += "<if>";
-                                    add_to_data_grid("reserved word", "if");
+                                    add_to_data_grid("reserved word", "if", Colors.Blue);
 
                                     i = y + 1;
                                     continue;
@@ -272,7 +273,7 @@ namespace Tiny
                                            (input_text[i + 4] == ':') && (input_text[i + 5] == '='))
                                         {
                                             //--      output.Text += "<then>";
-                                            add_to_data_grid("reserved word", "then");
+                                            add_to_data_grid("reserved word", "then", Colors.Blue);
 
                                             i = y + 3;
                                             continue;
@@ -302,7 +303,7 @@ namespace Tiny
                                                (input_text[i + 5] == ':') && (input_text[i + 6] == '='))
                                             {
                                                 //--   output.Text += "<until>";
-                                                add_to_data_grid("reserved word", "until");
+                                                add_to_data_grid("reserved word", "until", Colors.Blue);
 
                                                 i = y + 4;
                                                 continue;
@@ -333,7 +334,7 @@ namespace Tiny
                                                (input_text[i + 5] == ':') && (input_text[i + 6] == '='))
                                             {
                                                 //--     output.Text += "<write>";
-                                                add_to_data_grid("reserved word", "write");
+                                                add_to_data_grid("reserved word", "write", Colors.Blue);
 
                                                 i = y + 4;
                                                 continue;
@@ -360,14 +361,14 @@ namespace Tiny
                             {
                                 i = i + 1;
                                 //--   output.Text += item.Value;
-                                add_to_data_grid("special char", "assignment");
+                                add_to_data_grid("special char", "assignment", Colors.Purple);
 
                             }
                         }
                         else
                         {
                             //--  output.Text += item.Value;
-                            add_to_data_grid("special char", item.Value);
+                            add_to_data_grid("special char", item.Value, Colors.Purple);
 
                         }
                     }
@@ -385,14 +386,14 @@ namespace Tiny
                 {
                     variable += input_text[a];
                     if (input_text[a + 1] == ' ' || input_text[a + 1] == '\r' ||
-                        input_text[a + 1] == '+' || input_text[a + 1] == '-' || input_text[a + 4] == '*' ||
-                        input_text[a + 1] == '/' || input_text[a + 1] == '=' || input_text[a + 4] == '<' ||
-                        input_text[a + 1] == '(' || input_text[a + 1] == ')' || input_text[a + 4] == ';' ||
+                        input_text[a + 1] == '+' || input_text[a + 1] == '-' || input_text[a + 1] == '*' ||
+                        input_text[a + 1] == '/' || input_text[a + 1] == '=' || input_text[a + 1] == '<' ||
+                        input_text[a + 1] == '(' || input_text[a + 1] == ')' || input_text[a + 1] == ';' ||
                        (input_text[a + 1] == ':')&&(input_text[a + 2] == '='))
                     {
                         i = a;
                         //--    output.Text += "<variable: "+ variable + " >";
-                        add_to_data_grid("variable", variable);
+                        add_to_data_grid("variable", variable, Colors.Gray);
 
                         break;
                     }
@@ -417,14 +418,14 @@ namespace Tiny
                         {
                             //--     output.Text += "<number_float: " + number_variable + " >";
 
-                            add_to_data_grid("number_float", number_variable);
+                            add_to_data_grid("number_float", number_variable, Colors.Red);
 
                         }
                         else
                         {
                             //--   output.Text += "<number_int: " + number_variable + " >";
 
-                            add_to_data_grid("number_int", number_variable);
+                            add_to_data_grid("number_int", number_variable, Colors.Red);
 
                         }
                         break;
@@ -438,7 +439,7 @@ namespace Tiny
                     if (input_text[i] == ';')
                     {
                         //--  output.Text += "<semi col>";
-                        add_to_data_grid("special char", "semi col");
+                        add_to_data_grid("special char", "semi col", Colors.Purple);
 
                     }
                     //--  output.Text += "\n";
@@ -447,7 +448,11 @@ namespace Tiny
 
                 }
 
+                //if (input_text[i] == '}')
+                //{
+                //    get_comments(input.Document);
 
+                //}
 
 
                 #region comment
@@ -510,7 +515,8 @@ namespace Tiny
             }
 
 
-            IEnumerable<TextRange> wordRanges = GetAllWordRanges(input.Document);
+            
+                IEnumerable<TextRange> wordRanges = GetAllWordRanges(input.Document);
             foreach (TextRange wordRange in wordRanges)
             {
                 foreach (var item in reserved_words)
@@ -536,8 +542,14 @@ namespace Tiny
 
             }
 
-            get_comments(input.Document);
-            
+
+            IEnumerable<TextRange> comments_line = get_comments_line(input.Document);
+
+            foreach (TextRange wordRange in comments_line)
+            {
+                wordRange.ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Green);
+            }
+
             //IEnumerable<TextRange> CommentRanges = get_comments(input.Document);
             //foreach (TextRange wordRange in CommentRanges)
             //     {
@@ -553,9 +565,16 @@ namespace Tiny
         }
 
       
-        private void add_to_data_grid(string t, string v)
+        private void add_to_data_grid(string t, string v,Color c)
         {
-            myDataGrid.Items.Add(new MyData { Tokken = t, Value = v });
+            DataGridRow r = new DataGridRow();
+            MyData d = new MyData { Tokken = t, Value = v };
+            r.Item = d;
+            r.Foreground = new SolidColorBrush(c);
+
+            myDataGrid.Items.Add(r);
+
+            //myDataGrid.Items.Add(new MyData { Tokken = t, Value = v });
         }
 
         public static IEnumerable<TextRange> GetAllWordRanges(FlowDocument document)
@@ -583,83 +602,29 @@ namespace Tiny
             }
         }
 
-        public void get_comments(FlowDocument document)
+        public static IEnumerable<TextRange> get_comments_line(FlowDocument document)
         {
-            //string pattern = @"{ ([A-za-z0-9]* |(\n)* )* }";
-           // string pattern = @"{[A-za-z0-9-$]*}";
-           // string pattern = @"/\*.*?\*/";
-
             string pattern = @"{.*?\}";
 
-           // TextPointer pointer = document.ContentStart;
-
-           // string a = new TextRange(input.Document.ContentStart, input.Document.ContentEnd).Text + "   ";
-
-            TextPointer pointer = input.Document.ContentStart.GetInsertionPosition(LogicalDirection.Forward);
-            // Run r = new Run(a, tp);
-
-            //while (pointer != null)
-            //{
-            //     if (pointer.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.Text)
-            //     {
-                   string textRun = new TextRange(input.Document.ContentStart, input.Document.ContentEnd).Text;
-                  //  string textRun = pointer.GetTextInRun(LogicalDirection.Forward);
-                   MatchCollection matches = Regex.Matches(textRun, pattern,RegexOptions.Singleline);
-                   
-                   foreach (Match match in matches)
-                   {
-                       int startIndex = match.Index;
-                       int length = match.Length;
-                        Colorize(startIndex, length,Colors.Green);
-                // TextPointer start = pointer.GetPositionAtOffset(startIndex);
-                // TextPointer end = pointer.GetPositionAtOffset(length);
-
-                input.Selection.Select(input.Document.ContentEnd, input.Document.ContentEnd);
-                       //yield return new TextRange(start, end);
-                   }
-            //     }
-
-            //    pointer = pointer.GetNextContextPosition(LogicalDirection.Forward);
-            //}
-        }
-
-
-        private static TextPointer GetPoint(TextPointer start, int x)
-        {
-            var ret = start;
-            var i = 0;
-            while (i < x && ret != null)
+            TextPointer pointer = document.ContentStart;
+            while (pointer != null)
             {
-                if (ret.GetPointerContext(LogicalDirection.Backward) ==
-        TextPointerContext.Text ||
-                    ret.GetPointerContext(LogicalDirection.Backward) ==
-        TextPointerContext.None)
-                    i++;
-                if (ret.GetPositionAtOffset(1,
-        LogicalDirection.Forward) == null)
-                    return ret;
-                ret = ret.GetPositionAtOffset(1,
-        LogicalDirection.Forward);
+                if (pointer.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.Text)
+                {
+                    string textRun = pointer.GetTextInRun(LogicalDirection.Forward);
+                    MatchCollection matches = Regex.Matches(textRun, pattern);
+                    foreach (Match match in matches)
+                    {
+                        int startIndex = match.Index;
+                        int length = match.Length;
+                        TextPointer start = pointer.GetPositionAtOffset(startIndex);
+                        TextPointer end = start.GetPositionAtOffset(length);
+                        yield return new TextRange(start, end);
+                    }
+                }
+
+                pointer = pointer.GetNextContextPosition(LogicalDirection.Forward);
             }
-            return ret;
-        }
-
-        private void Colorize(int offset, int length, Color color)
-        {
-            var textRange = input.Selection;
-            var start = input.Document.ContentStart;
-            var startPos = GetPoint(start, offset);
-            var endPos = GetPoint(start, offset + length);
-
-            textRange.Select(startPos, endPos);
-            textRange.ApplyPropertyValue(TextElement.ForegroundProperty,
-            new SolidColorBrush(color));
-
-           //startPos = GetPoint(start, 0);
-           //endPos = GetPoint(start, 0 );
-           //
-           //textRange.Select(startPos, endPos);
-
         }
 
         public static IEnumerable<TextRange> get_numbers(FlowDocument document)
@@ -714,6 +679,88 @@ namespace Tiny
             }
         }
 
+        #region unused
+
+        #region comments
+        public void get_comments(FlowDocument document)
+        {
+            //string pattern = @"{ ([A-za-z0-9]* |(\n)* )* }";
+            // string pattern = @"{[A-za-z0-9-$]*}";
+            // string pattern = @"/\*.*?\*/";
+
+            string pattern = @"{.*?\}";
+
+           // TextPointer pointer = document.ContentStart;
+
+           // string a = new TextRange(input.Document.ContentStart, input.Document.ContentEnd).Text + "   ";
+
+            TextPointer pointer = input.Document.ContentStart.GetInsertionPosition(LogicalDirection.Forward);
+            // Run r = new Run(a, tp);
+
+            //while (pointer != null)
+            //{
+            //     if (pointer.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.Text)
+            //     {
+                   string textRun = new TextRange(input.Document.ContentStart, input.Document.ContentEnd).Text;
+                  //  string textRun = pointer.GetTextInRun(LogicalDirection.Forward);
+                   MatchCollection matches = Regex.Matches(textRun, pattern,RegexOptions.Singleline);
+                   
+                   foreach (Match match in matches)
+                   {
+                       int startIndex = match.Index;
+                       int length = match.Length;
+                        Colorize(startIndex, length,Colors.Green);
+                // TextPointer start = pointer.GetPositionAtOffset(startIndex);
+                // TextPointer end = pointer.GetPositionAtOffset(length);
+
+                input.Selection.Select(input.Document.ContentEnd, input.Document.ContentEnd);
+                       //yield return new TextRange(start, end);
+                   }
+            //     }
+
+            //    pointer = pointer.GetNextContextPosition(LogicalDirection.Forward);
+            //}
+        }
+        
+        private static TextPointer GetPoint(TextPointer start, int x)
+        {
+            var ret = start;
+            var i = 0;
+            while (i < x && ret != null)
+            {
+                if (ret.GetPointerContext(LogicalDirection.Backward) ==
+        TextPointerContext.Text ||
+                    ret.GetPointerContext(LogicalDirection.Backward) ==
+        TextPointerContext.None)
+                    i++;
+                if (ret.GetPositionAtOffset(1,
+        LogicalDirection.Forward) == null)
+                    return ret;
+                ret = ret.GetPositionAtOffset(1,
+        LogicalDirection.Forward);
+            }
+            return ret;
+        }
+
+        private void Colorize(int offset, int length, Color color)
+        {
+            var textRange = input.Selection;
+            var start = input.Document.ContentStart;
+            var startPos = GetPoint(start, offset);
+            var endPos = GetPoint(start, offset + length);
+
+            textRange.Select(startPos, endPos);
+            textRange.ApplyPropertyValue(TextElement.ForegroundProperty,
+            new SolidColorBrush(color));
+
+           //startPos = GetPoint(start, 0);
+           //endPos = GetPoint(start, 0 );
+           //
+           //textRange.Select(startPos, endPos);
+
+        }
+        #endregion
+
         private void color_selection(int start, int end, tiny_type t)
         {
             //TextPointer pointer = input.Document.ContentStart;
@@ -724,7 +771,7 @@ namespace Tiny
             //TextPointer enda = starta.GetPositionAtOffset(end);
             //TextRange wordRange = new TextRange(starta, enda);
             //wordRange.ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.HotPink);
-                    
+
 
             //input.UpdateLayout();
             //input.ScrollToEnd();
@@ -815,7 +862,7 @@ namespace Tiny
             // // input.Focus();
 
         }
-
+       
         //private void parse_comment(string text)
         //{
         //    int comment_start =0;
@@ -842,9 +889,11 @@ namespace Tiny
         //    {
 
         //    }
-          
-           
+
+
         //}
+        #endregion
+            
 
         private void input_KeyUp(object sender, KeyEventArgs e)
         {
@@ -855,7 +904,10 @@ namespace Tiny
                 wordRange.ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Black);
             }
 
-            get_comments(input.Document);
+
+          
+
+            ///----      get_comments(input.Document);
 
             // IEnumerable<TextRange> CommentRanges = get_comments(input.Document);
             // foreach (TextRange wordRange in CommentRanges)
@@ -873,24 +925,8 @@ namespace Tiny
                         wordRange.ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Blue);
                     }
                 }
-
-                foreach (var item in special_char)
-                {
-                    if (wordRange.Text == item.Key)
-                    {
-                        wordRange.ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Red);
-                    }
-                }
-
-                if (wordRange.Text == "{")
-                {
-                    wordRange.ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.HotPink);
-                }
-
             }
-
-
-
+            
             IEnumerable<TextRange> numRanges = get_numbers(input.Document);
             foreach (TextRange wordRange in numRanges)
             {
@@ -898,6 +934,314 @@ namespace Tiny
             }
 
 
+
+            IEnumerable<TextRange> wordRanges_commet = get_comments_line(input.Document);
+            foreach (TextRange wordRange in wordRanges_commet)
+            {
+                wordRange.ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Green);
+            }
+        }
+
+        int space = 20;
+        private void Draw_Click(object sender, RoutedEventArgs e)
+        {
+            //            string file = @"<amr>
+            //                <node type=""0"">
+            //                <node type=""if0"" ><node type=""if1"">
+            //                                <node type=""if2""><node type=""if3""/><node type=""if4""/></node>
+            //                                <node type=""if5""><node type=""if6""/></node>
+            //                            </node>
+            //                </node>
+
+            //                <node type=""while0"" ><node type=""while1"">
+            //                                <node type=""while2""/>
+            //                                <node type=""while3""/>
+            //                                <node type=""while4""/>
+            //                                <node type=""while5""><node type=""while6""><node type=""while7""/></node></node>
+            //                            </node>
+            //                </node>
+            //                </node>
+            //</amr>";
+
+            string file = @"<amr>
+            <node type=""0"">
+                            <node type=""if0"" >
+                                        <node type=""if1"">
+                                            <node type=""if2""/>
+                                            <node type=""if3""/>
+                                            <node type=""if4""/>
+                                            <node type=""if5""><node type=""if6""/></node>
+                                        </node>
+                            </node>
+            </node>
+            </amr>";
+
+            var doc = XDocument.Load(new StringReader(file));
+
+            // var gridElement = doc.Root.Elements("node").Where(p => p.Attribute("type").Value == "if");
+            var gridElement = doc.Root.Elements("node");
+
+            Point next_point = new Point(0, 0);
+            int i = 0;
+            int level = 1;
+
+            //foreach (var item in gridElement)
+            //{
+            //    CreateTree(item, next_point, level);
+            //}
+             CreateTree(gridElement.ElementAt(0), next_point, level,null);
+
+            int k = 5;
+
+            #region commented 3
+            //foreach (var item in gridElement)
+            //{
+            //    CreateTree(item,next_point,level);
+
+
+            //   ////// List<node> nodes = new List<node>();
+            //   //// string type_of_attr = item.Attribute("type").Value;
+
+            //   //// node n;
+            //   //// if (i == 0)
+            //   ////     n = new node(next_point.X, 0, type_of_attr, null);
+            //   //// else
+            //   ////     n = new node(next_point.X, 0, type_of_attr, nodes[i-1]);
+
+            //   //// syntax_canvas.Children.Add(n.rect);
+            //   //// syntax_canvas.Children.Add(n.text);
+
+            //   //// next_point = new Point(n.right_point.X + space, n.right_point.Y);
+            //   //// nodes.Add(n);
+
+            //   //// //inner nodes
+            //   //// if (type_of_attr == "if" || type_of_attr == "while")
+            //   //// {
+            //   ////     IEnumerable<XElement> inner_elements = item.Elements();
+            //   ////     foreach (var inner_element in inner_elements)
+            //   ////     {
+            //   ////         XElement temp = inner_element;
+
+            //   ////         node n_inner = new node(next_point.X, level * 20, inner_element.Attribute("type").Value, nodes.Last());
+            //   ////         syntax_canvas.Children.Add(n_inner.rect);
+            //   ////         syntax_canvas.Children.Add(n_inner.text);
+
+            //   ////         next_point = new Point(n_inner.right_point.X + space, n_inner.right_point.Y);
+            //   ////         nodes.Add(n_inner);
+
+            //   ////         level++;
+
+            //   ////         while (temp.HasElements)
+            //   ////         {
+            //   ////             foreach (var a in temp.Elements())
+            //   ////             {
+            //   ////                 node n_inner_inner = new node(next_point.X, level * 20, 
+            //   ////                                             inner_element.Attribute("type").Value, nodes.Last());
+
+            //   ////                 syntax_canvas.Children.Add(n_inner_inner.rect);
+            //   ////                 syntax_canvas.Children.Add(n_inner_inner.text);
+
+            //   ////                 next_point = new Point(n_inner_inner.right_point.X + space, n_inner_inner.right_point.Y);
+            //   ////                 nodes.Add(n_inner_inner);
+            //   ////             }
+            //   ////             temp = temp.Elements().First();
+            //   ////             level++;
+            //   ////         }
+            //   ////     }                    
+            //   //// }
+            //   //// i++;
+            //}
+            #endregion
+
+            #region commented2
+            ////draw rectangles ==>level 1
+            //for (int i = 0; i < 5; i++)
+            //{
+            //    node n = new node(next_point.X, 0,"aaa");
+            //    syntax_canvas.Children.Add(n.rect);
+            //    syntax_canvas.Children.Add(n.text);
+
+            //    next_point = new Point(n.right_point.X + space, n.right_point.Y);
+            //    nodes.Add(n);
+
+            //}
+            //next_point = new Point(0, 0);
+
+            ////draw rectangles ==> level 2
+            //for (int i = 0; i < 5; i++)
+            //{
+            //    node n = new node(next_point.X, space*3,"bbb");
+            //    syntax_canvas.Children.Add(n.rect);
+            //    syntax_canvas.Children.Add(n.text);
+
+            //    next_point = new Point(n.right_point.X + space, n.right_point.Y);
+            //    nodes.Add(n);
+
+            //}
+            #endregion
+
+            //draw inner links
+            foreach (var item in nodes)
+            {
+                if(item.prev_node !=null)
+                {
+                    link l = new link(item.prev_node, item);
+                    syntax_canvas.Children.Add(l.line);
+                }
+            }
+
+
+
+
+            #region commented
+            // Line line = new Line();
+            // line.StrokeThickness = 1;
+            // line.Stroke = Brushes.Black;
+            // line.X1 = n.right_point.X;           line.Y1 = n.right_point.Y;
+            // line.X2 = n.right_point.X + space;   line.Y2 = n.right_point.Y;
+            // syntax_canvas.Children.Add(line);
+
+
+
+            //Line bottom_line = new Line();
+            //bottom_line.StrokeThickness = 1;
+            //bottom_line.Stroke = Brushes.Black;
+
+            //bottom_line.X1 = n.bottom_point.X;           bottom_line.Y1 = n.bottom_point.Y;
+            //bottom_line.X2 = n.bottom_point.X-space;           bottom_line.Y2 = n.right_point.Y+space;
+
+            //syntax_canvas.Children.Add(bottom_line);
+
+            // Line bottom_line_2 = new Line();
+            // bottom_line_2.StrokeThickness = 1;
+            // bottom_line_2.Stroke = Brushes.Black;
+
+            // bottom_line_2.X1 = n.bottom_point.X;         bottom_line_2.Y1 = n.bottom_point.Y;
+            // bottom_line_2.X2 = n.bottom_point.X + space; bottom_line_2.Y2 = n.right_point.Y + space;
+
+            // syntax_canvas.Children.Add(bottom_line_2);
+            #endregion
+        }
+        List<node> nodes = new List<node>();
+        List<string> nodes_text = new List<string>();
+        XElement temp = new XElement("a");
+        return_type CreateTree(XElement item , Point next_point , int level, node prev_node)
+        {
+            node node = new node(next_point.X, level, item.Attribute("type").Value, prev_node);
+            
+            syntax_canvas.Children.Add(node.rect);
+            syntax_canvas.Children.Add(node.text);
+
+            nodes.Add(node);
+            nodes_text.Add(item.Attribute("type").Value);
+            temp = item;
+            level=level+70;
+
+            while (temp.HasElements) //inner elements
+            {
+                node pp_no = new node();
+                foreach (var a in temp.Elements()) //same level
+                {
+                    node n_inner_inner = new node(next_point.X, level ,
+                                                a.Attribute("type").Value,null);
+                    
+                    next_point = new Point(n_inner_inner.right_point.X + space, n_inner_inner.right_point.Y);
+                    temp = a;
+                    return_type rr = new return_type();
+                    rr = CreateTree(a, next_point, level, node);
+                    next_point = rr.return_point;
+                    pp_no = rr.return_node;
+                    // next_point = new Point(next_point.X + space, next_point.Y);
+                }
+
+                //  temp = temp.Elements().First();
+            }
+            return_type r = new return_type();
+            r.return_node = node;
+            r.return_point= next_point;
+
+            return r;
+            //while()
+            //{
+
+            //}
+            //node.childCount = board.GeAvailableMoveCount();
+            //node.value = board.GetValue;
+            //if (depth > 0 && node.childCount > 0)
+            //{
+            //    node.children = new Node*[node.childCount];
+            //    for (int i = 0; i != node.childCount; ++i)
+            //        node.children[i] = CreateTree(board.Move(i), depth - 1);
+            //}
+            //else
+            //{
+            //    node.children = NULL;
+            //}
+        }
+
+    }
+
+    class node
+    {
+       public node prev_node =null;
+       public List<node> childeren = null;
+        public bool visted = false;
+
+        public Rectangle rect = new Rectangle();
+       public TextBlock text = new TextBlock();
+        public string text_string = "";
+
+        public Point right_point = new Point();
+       public Point Left_point = new Point();
+       public Point bottom_point = new Point();
+       public Point top_point = new Point();
+
+       public node()
+       {
+       }
+
+       public node(double left, double top,string t , node prev_nodee)
+       {
+            this.prev_node = prev_nodee;
+            rect.Stroke = new SolidColorBrush(Colors.Black);
+            rect.Fill = new SolidColorBrush(Colors.White);
+            rect.Width = 98;
+            rect.Height = 50;
+
+            visted = true;
+
+            Canvas.SetLeft(rect, left);
+            Canvas.SetTop(rect, top);
+            Canvas.SetZIndex(rect, 50);
+
+            right_point = new Point(98 + left, (50 / 2) + top);
+            bottom_point = new Point(((98 + left)-(98/2) ), 50 + top);
+            top_point = new Point(((98 + left) - (98 / 2)), top);
+            Left_point = new Point(left , (50 / 2) + top);
+
+            text.Text = t;
+            text_string = t;
+            Canvas.SetLeft(text, (98 + left) - (98 / 2)-10);
+            Canvas.SetTop(text, (50 / 2) + top-10);
+            Canvas.SetZIndex(text, 60);
+
+        }
+    }
+    class return_type
+    {
+        public node return_node;
+        public Point return_point;
+    }
+    class link
+    {
+        public Line line = new Line();
+        public link(node n1 ,node n2)
+        {
+            line.StrokeThickness = 1;
+            line.Stroke = Brushes.Black;
+            
+            line.X1 = n1.right_point.X;     line.Y1 = n1.right_point.Y;
+            line.X2 = n2.Left_point.X;      line.Y2 = n2.Left_point.Y;
         }
     }
 }
