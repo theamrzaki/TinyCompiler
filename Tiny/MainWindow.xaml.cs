@@ -25,6 +25,7 @@ namespace Tiny
         public string Value { set; get; }
     }
 
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -69,16 +70,16 @@ namespace Tiny
            reserved_words.Add("write", " output ");
 
 
-           special_char.Add("+", " plus ");
-           special_char.Add("-", " minus ");
-           special_char.Add("*", " times ");
-           special_char.Add("/", " divide ");
-           special_char.Add("=", " equal ");
-           special_char.Add("<", " smaller ");
-           special_char.Add("(", " left_bracket ");
-           special_char.Add(")", " right_bracket ");
-          // special_char.Add(";", " semi_col ");
-           special_char.Add(":", " assignment ");
+           special_char.Add("+", "plus");
+           special_char.Add("-", "minus");
+           special_char.Add("*", "times");
+           special_char.Add("/", "divide");
+           special_char.Add("=", "equal");
+           special_char.Add("<", "smaller");
+           special_char.Add("(", "left_bracket");
+           special_char.Add(")", "right_bracket");
+          // special_char.Add(";"," semi_col ");
+           special_char.Add(":", "assignment");
 
         }
 
@@ -387,7 +388,7 @@ namespace Tiny
                     variable += input_text[a];
                     if (input_text[a + 1] == ' ' || input_text[a + 1] == '\r' ||
                         input_text[a + 1] == '+' || input_text[a + 1] == '-' || input_text[a + 1] == '*' ||
-                        input_text[a + 1] == '/' || input_text[a + 1] == '=' || input_text[a + 1] == '<' ||
+                        input_text[a + 1] == '/' || input_text[a + 1] == '=' || input_text[a + 1] == '<' || input_text[a + 1] == '>' ||
                         input_text[a + 1] == '(' || input_text[a + 1] == ')' || input_text[a + 1] == ';' ||
                        (input_text[a + 1] == ':')&&(input_text[a + 2] == '='))
                     {
@@ -454,7 +455,6 @@ namespace Tiny
 
                 //}
 
-
                 #region comment
                 //using (StringReader sr = new StringReader(input.Text))
                 //{
@@ -513,10 +513,11 @@ namespace Tiny
                 //}
                 #endregion
             }
+            parse();
 
 
-            
-                IEnumerable<TextRange> wordRanges = GetAllWordRanges(input.Document);
+
+            IEnumerable<TextRange> wordRanges = GetAllWordRanges(input.Document);
             foreach (TextRange wordRange in wordRanges)
             {
                 foreach (var item in reserved_words)
@@ -564,7 +565,8 @@ namespace Tiny
 
         }
 
-      
+
+        List<string> tokken_List = new List<string>();
         private void add_to_data_grid(string t, string v,Color c)
         {
             DataGridRow r = new DataGridRow();
@@ -572,11 +574,13 @@ namespace Tiny
             r.Item = d;
             r.Foreground = new SolidColorBrush(c);
 
+            tokken_List.Add(v);
             myDataGrid.Items.Add(r);
 
             //myDataGrid.Items.Add(new MyData { Tokken = t, Value = v });
         }
 
+        #region coloring 
         public static IEnumerable<TextRange> GetAllWordRanges(FlowDocument document)
         {
             string pattern = @"[^\W\d](\w|[-']{1,2}(?=\w))*";
@@ -678,6 +682,194 @@ namespace Tiny
                 pointer = pointer.GetNextContextPosition(LogicalDirection.Forward);
             }
         }
+        #endregion
+
+
+        #region parser
+        int index=0;
+        string tree = "";
+        //root function ==> statement looper
+        private void parse()
+        {
+            stmt_equence();
+        }
+
+        private void stmt_equence()
+        {
+            switch (tokken_List[index])
+            {
+                case "if":
+                    Match_if();
+                    break;
+                case "repeat":
+                    Match_repeat();
+                    break;
+                case "read":
+                    Match_read();
+                    break;
+                case "write":
+                    Match_write();
+                    break;
+                case "semi col":
+                    index++;
+                    stmt_equence();
+                    break;
+                default:
+                    Match_assign();
+                    break;
+            }
+        }
+
+        //function for the if condition
+        private void Match_if()//done
+        {
+            tree += "<node type=\"if\" >";
+            Match_expression();
+            //now we expect then
+            if (tokken_List[index] == "then")
+            {
+                tree += "<node type=\"then\" >";
+                index++;
+                stmt_equence();
+                tree += "</node>";
+
+                //now we excpect else or end
+                if (tokken_List[index] == "else" || tokken_List[index] == "end")
+                {
+                    if (tokken_List[index]== "else")
+                    {
+                        tree += "<node type=\"else\" >";
+                        index++;
+                        stmt_equence();
+                        tree += "</node>";
+                    }
+                    if (tokken_List[index] == "end")
+                    {
+                        index++;
+                        tree += "</node>";
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("error at " + index);
+                }
+            }
+            else
+            {
+                MessageBox.Show("error at " + index);
+            }
+        }
+        
+        private void Match_repeat()//done
+        {
+            tree += "<node type=\"repeat\" >";
+            index++;
+            stmt_equence();
+
+            //now we expect until
+            if (tokken_List[index] == "until")
+            {
+                index++;
+                Match_expression();
+                tree += "</node>";
+            }
+            else
+            {
+                MessageBox.Show("error at " + index);
+            }
+        }
+        
+        private void Match_read()//done
+        {
+            tree += "<node type=\"read (" + tokken_List[index] + ") \">";
+            index = index + 1;
+        }
+
+        private void Match_write()//done
+        {
+            tree += "<node type=\"write\" >";
+            Match_expression();
+            tree += "</node>";
+        }
+
+        private void Match_assign()//done
+        {
+            index ++; //id
+            if (tokken_List[index] == "assignment")
+            {
+                tree += "<node type=\"assign (" + tokken_List[index-1] + ") \">";
+                index++;
+
+                if (index == tokken_List.Count()) return;
+
+                Match_expression();
+                //index = index + 2;//must be 1
+            }
+            else
+            {
+                if (tokken_List[index] == "semi col") return;
+                MessageBox.Show("error at " + index);
+            }
+        }
+
+      
+
+        //-----------------------------------expression----------------------------------------------------------
+        private void Match_expression()
+        {
+            Match_term();
+
+            if (tokken_List[index] == "plus" || tokken_List[index] == "minus")
+            {
+                tree += "<node type=\""+ tokken_List[index] + "\" shape=\"circle\">";
+                index++;
+                Match_term();
+                tree += "</node>";
+                index++;
+                stmt_equence();
+            }
+            else
+            {
+            }
+        }
+        private void Match_term()
+        {
+            Match_factor();
+            if (tokken_List[index] == "times")
+            {
+                tree += "<node type=\"" + tokken_List[index] + "\" shape=\"circle\">";
+                index++;
+                Match_factor();
+                tree += "</node>";
+            }
+            else
+            {
+            }
+        }
+        private void Match_factor()
+        {
+            if (tokken_List[index] == "left_bracket")
+            {
+                index++;
+                Match_expression();
+                if (tokken_List[index] == "right_bracket")
+                {
+                    index++;
+                }
+                else
+                {
+                    MessageBox.Show("no right bracket at tokken" + index);
+                }
+            }
+            else
+            {
+                tree += "<node type=\"" + tokken_List[index] + "\" shape=\"circle\" />";
+                index++;
+            }
+
+        }
+
+        #endregion
 
         #region unused
 
@@ -690,9 +882,9 @@ namespace Tiny
 
             string pattern = @"{.*?\}";
 
-           // TextPointer pointer = document.ContentStart;
+            // TextPointer pointer = document.ContentStart;
 
-           // string a = new TextRange(input.Document.ContentStart, input.Document.ContentEnd).Text + "   ";
+            // string a = new TextRange(input.Document.ContentStart, input.Document.ContentEnd).Text + "   ";
 
             TextPointer pointer = input.Document.ContentStart.GetInsertionPosition(LogicalDirection.Forward);
             // Run r = new Run(a, tp);
@@ -701,27 +893,27 @@ namespace Tiny
             //{
             //     if (pointer.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.Text)
             //     {
-                   string textRun = new TextRange(input.Document.ContentStart, input.Document.ContentEnd).Text;
-                  //  string textRun = pointer.GetTextInRun(LogicalDirection.Forward);
-                   MatchCollection matches = Regex.Matches(textRun, pattern,RegexOptions.Singleline);
-                   
-                   foreach (Match match in matches)
-                   {
-                       int startIndex = match.Index;
-                       int length = match.Length;
-                        Colorize(startIndex, length,Colors.Green);
+            string textRun = new TextRange(input.Document.ContentStart, input.Document.ContentEnd).Text;
+            //  string textRun = pointer.GetTextInRun(LogicalDirection.Forward);
+            MatchCollection matches = Regex.Matches(textRun, pattern, RegexOptions.Singleline);
+
+            foreach (Match match in matches)
+            {
+                int startIndex = match.Index;
+                int length = match.Length;
+                Colorize(startIndex, length, Colors.Green);
                 // TextPointer start = pointer.GetPositionAtOffset(startIndex);
                 // TextPointer end = pointer.GetPositionAtOffset(length);
 
                 input.Selection.Select(input.Document.ContentEnd, input.Document.ContentEnd);
-                       //yield return new TextRange(start, end);
-                   }
+                //yield return new TextRange(start, end);
+            }
             //     }
 
             //    pointer = pointer.GetNextContextPosition(LogicalDirection.Forward);
             //}
         }
-        
+
         private static TextPointer GetPoint(TextPointer start, int x)
         {
             var ret = start;
@@ -753,10 +945,10 @@ namespace Tiny
             textRange.ApplyPropertyValue(TextElement.ForegroundProperty,
             new SolidColorBrush(color));
 
-           //startPos = GetPoint(start, 0);
-           //endPos = GetPoint(start, 0 );
-           //
-           //textRange.Select(startPos, endPos);
+            //startPos = GetPoint(start, 0);
+            //endPos = GetPoint(start, 0 );
+            //
+            //textRange.Select(startPos, endPos);
 
         }
         #endregion
@@ -862,7 +1054,7 @@ namespace Tiny
             // // input.Focus();
 
         }
-       
+
         //private void parse_comment(string text)
         //{
         //    int comment_start =0;
@@ -893,7 +1085,7 @@ namespace Tiny
 
         //}
         #endregion
-            
+
 
         private void input_KeyUp(object sender, KeyEventArgs e)
         {
@@ -942,6 +1134,10 @@ namespace Tiny
             }
         }
 
+
+
+
+        #region drawer
         int space = 20;
         private void Draw_Click(object sender, RoutedEventArgs e)
         {
@@ -1224,7 +1420,7 @@ namespace Tiny
             //    node.children = NULL;
             //}
         }
-
+        #endregion
     }
 
     class node
