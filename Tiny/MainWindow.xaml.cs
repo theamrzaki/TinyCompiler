@@ -964,13 +964,24 @@ namespace Tiny
             //</amr>";
 
             string file = @"<amr>
-            <node type=""0"">
+            <node type=""start"">
                             <node type=""if0"" >
-                                        <node type=""if1"">
-                                            <node type=""if2""/>
+                                        <node type=""then part"">
+                                            <node type=""if2"">
+                                                      <node type=""2 then"">
+                                                            <node type=""inner""/>
+                                                        </node>
+                                                      <node type=""2 else""/>  
+                                                </node>
                                             <node type=""if3""/>
                                             <node type=""if4""/>
                                             <node type=""if5""><node type=""if6""/></node>
+                                        </node>
+                                         <node type=""else part"">
+                                            <node type=""if7""/>
+                                            <node type=""if8""/>
+                                            <node type=""if9""/>
+                                            <node type=""if10""><node type=""if11""/></node>
                                         </node>
                             </node>
             </node>
@@ -1085,6 +1096,7 @@ namespace Tiny
             {
                 if(item.prev_node !=null)
                 {
+
                     link l = new link(item.prev_node, item);
                     syntax_canvas.Children.Add(l.line);
                 }
@@ -1122,36 +1134,70 @@ namespace Tiny
             // syntax_canvas.Children.Add(bottom_line_2);
             #endregion
         }
-        List<node> nodes = new List<node>();
-        List<string> nodes_text = new List<string>();
+        HashSet<node> nodes = new HashSet<node>();
+        HashSet<string> nodes_text = new HashSet<string>();
         XElement temp = new XElement("a");
+        node reserved_node = new node();
         return_type CreateTree(XElement item , Point next_point , int level, node prev_node)
         {
             node node = new node(next_point.X, level, item.Attribute("type").Value, prev_node);
-            
-            syntax_canvas.Children.Add(node.rect);
-            syntax_canvas.Children.Add(node.text);
+            if(item.Attribute("type").Value != "start")
+            {
+                syntax_canvas.Children.Add(node.rect);
+                syntax_canvas.Children.Add(node.text);
 
-            nodes.Add(node);
-            nodes_text.Add(item.Attribute("type").Value);
+                nodes.Add(node);
+                nodes_text.Add(item.Attribute("type").Value);
+                level = level + 70;
+            }
+
             temp = item;
-            level=level+70;
 
             while (temp.HasElements) //inner elements
             {
                 node pp_no = new node();
+                int k = 0;
                 foreach (var a in temp.Elements()) //same level
                 {
                     node n_inner_inner = new node(next_point.X, level ,
-                                                a.Attribute("type").Value,null);
+                                                a.Attribute("type").Value, node);
                     
                     next_point = new Point(n_inner_inner.right_point.X + space, n_inner_inner.right_point.Y);
                     temp = a;
+
                     return_type rr = new return_type();
-                    rr = CreateTree(a, next_point, level, node);
+
+                     //try
+                     //{
+                     //    if (nodes[k - 1].text_string == "then part" ||
+                     // nodes[k - 1].text_string == "else part")
+                     //    {
+                     //        rr = CreateTree(a, next_point, level, node);
+                     //    }
+                     //    else
+                     //    {
+                     //        rr = CreateTree(a, next_point, level, n_inner_inner);
+                     //    }
+                     //}
+                     //catch (Exception)
+                     //{
+                        // rr = CreateTree(a, next_point, level, node);
+                     
+                     //}
+                     if(k==0)
+                    {
+                        rr = CreateTree(a, next_point, level, node);
+
+                        // rr = CreateTree(a, next_point, level, n_inner_inner);
+                    }
+                    else
+                        rr = CreateTree(a, next_point, level, pp_no);
+
+
                     next_point = rr.return_point;
                     pp_no = rr.return_node;
                     // next_point = new Point(next_point.X + space, next_point.Y);
+                    k++;
                 }
 
                 //  temp = temp.Elements().First();
