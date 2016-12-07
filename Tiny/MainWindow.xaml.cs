@@ -25,7 +25,11 @@ namespace Tiny
         public string Value { set; get; }
     }
 
-
+    enum shape_type
+    {
+        rectangel,
+        circle
+    };
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -42,6 +46,8 @@ namespace Tiny
             comment,
             number
         };
+
+        
 
         public MainWindow()
         {
@@ -88,6 +94,8 @@ namespace Tiny
         private void compile_Click(object sender, RoutedEventArgs e)
         {
             myDataGrid.Items.Clear();
+            tree = "";
+            index = 0;
             //string richText = new TextRange(input.Document.ContentStart, input.Document.ContentEnd).Text;
             //--------------------->> parse_comment(input.Text);
 
@@ -513,7 +521,21 @@ namespace Tiny
                 //}
                 #endregion
             }
-            parse();
+            try
+            {
+                tree += "<amr><node type = \"start\" >";
+                parse();
+                tree += "</node></amr>";
+                Draw_Click();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("please put a semi col... error was in "+ index);
+                
+                tree = "";
+                index = 0;
+            }
+            
 
 
 
@@ -696,6 +718,7 @@ namespace Tiny
 
         private void stmt_equence()
         {
+            if (index == tokken_List.Count) return;
             switch (tokken_List[index])
             {
                 case "if":
@@ -721,7 +744,7 @@ namespace Tiny
         }
 
         //function for the if condition
-        private void Match_if()//done
+        private void Match_if()//tested
         {
             tree += "<node type=\"if\" >";
             Match_expression();
@@ -760,18 +783,24 @@ namespace Tiny
             }
         }
         
-        private void Match_repeat()//done
+        private void Match_repeat()//tested
         {
             tree += "<node type=\"repeat\" >";
+
+            tree += "<node type=\"loop_part\" >";
             index++;
             stmt_equence();
+            tree += "</node>";
 
             //now we expect until
             if (tokken_List[index] == "until")
             {
+                tree += "<node type=\"condition_part\" >";
                 index++;
                 Match_expression();
                 tree += "</node>";
+
+           //     tree += "</node>";
             }
             else
             {
@@ -779,15 +808,16 @@ namespace Tiny
             }
         }
         
-        private void Match_read()//done
+        private void Match_read()//tested
         {
-            tree += "<node type=\"read (" + tokken_List[index] + ") \">";
             index = index + 1;
+            tree += "<node type=\"read (" + tokken_List[index] + ") \">";
         }
 
-        private void Match_write()//done
+        private void Match_write()//tested
         {
             tree += "<node type=\"write\" >";
+            index++;
             Match_expression();
             tree += "</node>";
         }
@@ -821,15 +851,28 @@ namespace Tiny
 
             if (tokken_List[index] == "plus" || tokken_List[index] == "minus")
             {
-                tree += "<node type=\""+ tokken_List[index] + "\" shape=\"circle\">";
+                tree += "<node type=\""+ tokken_List[index] + "\" shape=\"circle\" />";
                 index++;
                 Match_term();
                 tree += "</node>";
-                index++;
-                stmt_equence();
+               
             }
             else
             {
+
+                if (tokken_List[index] == "equal"   ||
+                    tokken_List[index] == "smaller" ||
+                    tokken_List[index] == "bigger")
+                {
+                    tree += "<node type=\"" + tokken_List[index] + "\" shape=\"circle\" />";
+                    index++;
+                    Match_expression();
+                    tree += "</node>";
+                }
+                else if (tokken_List[index] =="semi col")
+                {
+                    stmt_equence();
+                }
             }
         }
         private void Match_term()
@@ -837,7 +880,7 @@ namespace Tiny
             Match_factor();
             if (tokken_List[index] == "times")
             {
-                tree += "<node type=\"" + tokken_List[index] + "\" shape=\"circle\">";
+                tree += "<node type=\"" + tokken_List[index] + "\" shape=\"circle\" />";
                 index++;
                 Match_factor();
                 tree += "</node>";
@@ -1139,8 +1182,9 @@ namespace Tiny
 
         #region drawer
         int space = 20;
-        private void Draw_Click(object sender, RoutedEventArgs e)
+        private void Draw_Click()
         {
+            #region xaml example
             //            string file = @"<amr>
             //                <node type=""0"">
             //                <node type=""if0"" ><node type=""if1"">
@@ -1159,30 +1203,33 @@ namespace Tiny
             //                </node>
             //</amr>";
 
-            string file = @"<amr>
-            <node type=""start"">
-                            <node type=""if0"" >
-                                        <node type=""then part"">
-                                            <node type=""if2"">
-                                                      <node type=""2 then"">
-                                                            <node type=""inner""/>
-                                                        </node>
-                                                      <node type=""2 else""/>  
-                                                </node>
-                                            <node type=""if3""/>
-                                            <node type=""if4""/>
-                                            <node type=""if5""><node type=""if6""/></node>
-                                        </node>
-                                         <node type=""else part"">
-                                            <node type=""if7""/>
-                                            <node type=""if8""/>
-                                            <node type=""if9""/>
-                                            <node type=""if10""><node type=""if11""/></node>
-                                        </node>
-                            </node>
-            </node>
-            </amr>";
+            //string file = @"<amr>
+            //<node type=""start"">
+            //                <node type=""if0"" >
+            //                            <node type=""then part"">
+            //                                <node type=""if2"">
+            //                                          <node type=""2 then"">
+            //                                                <node type=""inner""/>
+            //                                            </node>
+            //                                          <node type=""2 else""/>  
+            //                                    </node>
+            //                                <node type=""if3""/>
+            //                                <node type=""if4""/>
+            //                                <node type=""if5""><node type=""if6""/></node>
+            //                            </node>
+            //                             <node type=""else part"">
+            //                                <node type=""if7""/>
+            //                                <node type=""if8""/>
+            //                                <node type=""if9""/>
+            //                                <node type=""if10""><node type=""if11""/></node>
+            //                            </node>
+            //                </node>
+            //</node>
+            //</amr>";
+            #endregion
 
+
+            string file = tree;
             var doc = XDocument.Load(new StringReader(file));
 
             // var gridElement = doc.Root.Elements("node").Where(p => p.Attribute("type").Value == "if");
@@ -1336,7 +1383,21 @@ namespace Tiny
         node reserved_node = new node();
         return_type CreateTree(XElement item , Point next_point , int level, node prev_node)
         {
-            node node = new node(next_point.X, level, item.Attribute("type").Value, prev_node);
+            //shape_type sh = shape_type.rectangel;
+            //try
+            //{
+            //    if(item.Attribute("shape").Value=="circle")
+            //    {
+            //        sh = shape_type.circle;
+            //    }
+            //}
+            //catch (Exception)
+            //{
+
+            //    throw;
+            //}
+
+            node node = new node(next_point.X, level, item.Attribute("type").Value, prev_node/*,sh*/);
             if(item.Attribute("type").Value != "start")
             {
                 syntax_canvas.Children.Add(node.rect);
@@ -1355,6 +1416,7 @@ namespace Tiny
                 int k = 0;
                 foreach (var a in temp.Elements()) //same level
                 {
+                    //shape_type sssh = shape_type.rectangel;
                     node n_inner_inner = new node(next_point.X, level ,
                                                 a.Attribute("type").Value, node);
                     
@@ -1421,6 +1483,20 @@ namespace Tiny
             //}
         }
         #endregion
+
+        private void move_right_Click(object sender, RoutedEventArgs e)
+        {
+            Thickness t = syntax_canvas.Margin;
+            t.Left -= 100;
+            syntax_canvas.Margin = t;
+        }
+
+        private void move_left_Click(object sender, RoutedEventArgs e)
+        {
+            Thickness t = syntax_canvas.Margin;
+            t.Left += 100;
+            syntax_canvas.Margin = t;
+        }
     }
 
     class node
@@ -1430,7 +1506,9 @@ namespace Tiny
         public bool visted = false;
 
         public Rectangle rect = new Rectangle();
-       public TextBlock text = new TextBlock();
+        public Ellipse circle = new Ellipse();
+
+        public TextBlock text = new TextBlock();
         public string text_string = "";
 
         public Point right_point = new Point();
@@ -1442,19 +1520,34 @@ namespace Tiny
        {
        }
 
-       public node(double left, double top,string t , node prev_nodee)
+       public node(double left, double top,string t , node prev_nodee /*,shape_type sh*/)
        {
             this.prev_node = prev_nodee;
-            rect.Stroke = new SolidColorBrush(Colors.Black);
-            rect.Fill = new SolidColorBrush(Colors.White);
-            rect.Width = 98;
-            rect.Height = 50;
+            //if(sh ==shape_type.rectangel)
+            //{
+                rect.Stroke = new SolidColorBrush(Colors.Black);
+                rect.Fill = new SolidColorBrush(Colors.White);
+                rect.Width = 98;
+                rect.Height = 50;
 
+                Canvas.SetLeft(rect, left);
+                Canvas.SetTop(rect, top);
+                Canvas.SetZIndex(rect, 50);
+            //}
+            //else
+            //{
+            //    circle.Stroke = new SolidColorBrush(Colors.Black);
+            //    circle.Fill = new SolidColorBrush(Colors.White);
+            //    circle.Width = 98;
+            //    circle.Height = 50;
+
+            //    Canvas.SetLeft(circle, left);
+            //    Canvas.SetTop(circle, top);
+            //    Canvas.SetZIndex(circle, 50);
+            //}
             visted = true;
 
-            Canvas.SetLeft(rect, left);
-            Canvas.SetTop(rect, top);
-            Canvas.SetZIndex(rect, 50);
+           
 
             right_point = new Point(98 + left, (50 / 2) + top);
             bottom_point = new Point(((98 + left)-(98/2) ), 50 + top);
@@ -1486,4 +1579,7 @@ namespace Tiny
             line.X2 = n2.Left_point.X;      line.Y2 = n2.Left_point.Y;
         }
     }
+
+
+
 }
