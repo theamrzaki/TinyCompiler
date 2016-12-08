@@ -747,13 +747,17 @@ namespace Tiny
         private void Match_if()//tested
         {
             tree += "<node type=\"if\" >";
+            index++;
+            tree += "<node type=\"condition\" >";
             Match_expression();
+
             //now we expect then
             if (tokken_List[index] == "then")
             {
                 tree += "<node type=\"then\" >";
                 index++;
                 stmt_equence();
+                tree += "</node>";
                 tree += "</node>";
 
                 //now we excpect else or end
@@ -770,6 +774,8 @@ namespace Tiny
                     {
                         index++;
                         tree += "</node>";
+                        tree += "</node>";
+
                     }
                 }
                 else
