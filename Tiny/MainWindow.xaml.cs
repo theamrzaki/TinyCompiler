@@ -744,7 +744,7 @@ namespace Tiny
         }
 
         //function for the if condition
-        private void Match_if()//tested
+        private void Match_if()//
         {
             tree += "<node type=\"if\" >";
             index++;
@@ -797,12 +797,11 @@ namespace Tiny
             index++;
             stmt_equence();
             tree += "</node>";
-
+            
             //now we expect until
-            if (tokken_List[index] == "until")
+            if (tokken_List[index-1] == "until")
             {
                 tree += "<node type=\"condition_part\" >";
-                index++;
                 Match_expression();
                 tree += "</node>";
 
@@ -810,14 +809,17 @@ namespace Tiny
             }
             else
             {
-                MessageBox.Show("error at " + index);
+                //MessageBox.Show("error at " + index);
             }
         }
         
         private void Match_read()//tested
         {
             index = index + 1;
-            tree += "<node type=\"read (" + tokken_List[index] + ") \">";
+            tree += "<node type=\"read (" + tokken_List[index] + ") \" />";
+            index = index + 1;
+
+            stmt_equence();
         }
 
         private void Match_write()//tested
@@ -825,10 +827,9 @@ namespace Tiny
             tree += "<node type=\"write\" >";
             index++;
             Match_expression();
-            tree += "</node>";
         }
 
-        private void Match_assign()//done
+        private void Match_assign()//tested
         {
             index ++; //id
             if (tokken_List[index] == "assignment")
@@ -840,11 +841,17 @@ namespace Tiny
 
                 Match_expression();
                 //index = index + 2;//must be 1
-            }
+
+                 if (tokken_List[index] == "semi col")
+                 {
+                    index++;
+                    stmt_equence();
+                 }
+          }
             else
             {
                 if (tokken_List[index] == "semi col") return;
-                MessageBox.Show("error at " + index);
+                //MessageBox.Show("error at " + index);
             }
         }
 
@@ -884,22 +891,14 @@ namespace Tiny
             {
                 was_exp = false;
                 Match_expression();
-                tree += "</node>";
+                tree += "</node>"; //of plus | minus | ...
             }
-            else if (tokken_List[index] == "semi col")
+            else if (tokken_List[index] == "semi col" )
             {
-                if (was_exp)
-                {
-                    tree += temp_factor;
-
-                    tree += "</node>";//of plus | minus | ...
-                }
-                else // assignment of a single factor
-                {
-                    tree += temp_factor;
-                }
+                tree += temp_factor;
                 tree += "</node>";//of assign
-                stmt_equence();
+                //index++;
+                //stmt_equence();
             }
         }
         private void Match_term()
