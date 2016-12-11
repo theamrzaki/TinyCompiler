@@ -531,7 +531,7 @@ namespace Tiny
             catch (Exception)
             {
                 MessageBox.Show("please put a semi col... error was in "+ index);
-                
+                temp_factor = "";
                 tree = "";
                 index = 0;
             }
@@ -848,37 +848,58 @@ namespace Tiny
             }
         }
 
-      
+
 
         //-----------------------------------expression----------------------------------------------------------
+        string temp_factor="";
+        bool was_exp = false;
         private void Match_expression()
         {
             Match_term();
+            index++;
 
-            if (tokken_List[index] == "plus" || tokken_List[index] == "minus")
-            {
-                tree += "<node type=\""+ tokken_List[index] + "\" shape=\"circle\" />";
-                index++;
-                Match_term();
-                tree += "</node>";
-               
-            }
-            else
-            {
-
-                if (tokken_List[index] == "equal"   ||
+            if (tokken_List[index] == "plus" || tokken_List[index] == "minus" || tokken_List[index] == "equal" ||
                     tokken_List[index] == "smaller" ||
                     tokken_List[index] == "bigger")
+            {
+                was_exp = true;
+                tree += "<node type=\""+ tokken_List[index] + "\" shape=\"circle\" >" + temp_factor;
+                index++;
+                Match_term();
+            }
+            #region commented
+            //else if(tokken_List[index] == "equal" ||
+            //        tokken_List[index] == "smaller" ||
+            //        tokken_List[index] == "bigger")
+            //{
+            //    was_exp = true;
+
+            //    tree += "<node type=\"" + tokken_List[index] + "\" shape=\"circle\" />";
+            //        index++;
+            //        Match_expression();
+            //        //tree += "</node>";
+            //}
+            #endregion
+            if (tokken_List[index] != "semi col")
+            {
+                was_exp = false;
+                Match_expression();
+                tree += "</node>";
+            }
+            else if (tokken_List[index] == "semi col")
+            {
+                if (was_exp)
                 {
-                    tree += "<node type=\"" + tokken_List[index] + "\" shape=\"circle\" />";
-                    index++;
-                    Match_expression();
-                    tree += "</node>";
+                    tree += temp_factor;
+
+                    tree += "</node>";//of plus | minus | ...
                 }
-                else if (tokken_List[index] =="semi col")
+                else // assignment of a single factor
                 {
-                    stmt_equence();
+                    tree += temp_factor;
                 }
+                tree += "</node>";//of assign
+                stmt_equence();
             }
         }
         private void Match_term()
@@ -912,8 +933,8 @@ namespace Tiny
             }
             else
             {
-                tree += "<node type=\"" + tokken_List[index] + "\" shape=\"circle\" />";
-                index++;
+                temp_factor = "<node type=\"" + tokken_List[index] + "\" shape=\"circle\" />";
+                //index++;
             }
 
         }
@@ -1389,24 +1410,29 @@ namespace Tiny
         node reserved_node = new node();
         return_type CreateTree(XElement item , Point next_point , int level, node prev_node)
         {
-            //shape_type sh = shape_type.rectangel;
-            //try
-            //{
-            //    if(item.Attribute("shape").Value=="circle")
-            //    {
-            //        sh = shape_type.circle;
-            //    }
-            //}
-            //catch (Exception)
-            //{
+            shape_type sh = shape_type.rectangel;
+            try
+            {
+                if(item.Attribute("shape").Value=="circle")
+                {
+                    sh = shape_type.circle;
+                }
+            }
+            catch (Exception)
+            {
+            }
 
-            //    throw;
-            //}
-
-            node node = new node(next_point.X, level, item.Attribute("type").Value, prev_node/*,sh*/);
+            node node = new node(next_point.X, level, item.Attribute("type").Value, prev_node,sh);
             if(item.Attribute("type").Value != "start")
             {
-                syntax_canvas.Children.Add(node.rect);
+                if (sh == shape_type.rectangel)
+                {
+                    syntax_canvas.Children.Add(node.rect);
+                }
+                else if(sh == shape_type.circle)
+                {
+                    syntax_canvas.Children.Add(node.circle);
+                }
                 syntax_canvas.Children.Add(node.text);
 
                 nodes.Add(node);
@@ -1424,37 +1450,41 @@ namespace Tiny
                 {
                     //shape_type sssh = shape_type.rectangel;
                     node n_inner_inner = new node(next_point.X, level ,
-                                                a.Attribute("type").Value, node);
+                                                a.Attribute("type").Value, node, sh);
                     
                     next_point = new Point(n_inner_inner.right_point.X + space, n_inner_inner.right_point.Y);
                     temp = a;
 
                     return_type rr = new return_type();
 
-                     //try
-                     //{
-                     //    if (nodes[k - 1].text_string == "then part" ||
-                     // nodes[k - 1].text_string == "else part")
-                     //    {
-                     //        rr = CreateTree(a, next_point, level, node);
-                     //    }
-                     //    else
-                     //    {
-                     //        rr = CreateTree(a, next_point, level, n_inner_inner);
-                     //    }
-                     //}
-                     //catch (Exception)
-                     //{
-                        // rr = CreateTree(a, next_point, level, node);
+                    //try
+                    //{
+                    //    if (nodes[k - 1].text_string == "then part" ||
+                    // nodes[k - 1].text_string == "else part")
+                    //    {
+                    //        rr = CreateTree(a, next_point, level, node);
+                    //    }
+                    //    else
+                    //    {
+                    //        rr = CreateTree(a, next_point, level, n_inner_inner);
+                    //    }
+                    //}
+                    //catch (Exception)
+                    //{
+
+                    if(sh == shape_type.circle)
+                    rr = CreateTree(a, next_point, level, node);
                      
                      //}
-                     if(k==0)
+                    if(k==0)
                     {
+                        if(sh != shape_type.circle)
                         rr = CreateTree(a, next_point, level, node);
 
                         // rr = CreateTree(a, next_point, level, n_inner_inner);
                     }
                     else
+                        if (sh != shape_type.circle)
                         rr = CreateTree(a, next_point, level, pp_no);
 
 
@@ -1526,31 +1556,31 @@ namespace Tiny
        {
        }
 
-       public node(double left, double top,string t , node prev_nodee /*,shape_type sh*/)
+       public node(double left, double top,string t , node prev_nodee ,shape_type sh)
        {
             this.prev_node = prev_nodee;
-            //if(sh ==shape_type.rectangel)
-            //{
-                rect.Stroke = new SolidColorBrush(Colors.Black);
-                rect.Fill = new SolidColorBrush(Colors.White);
-                rect.Width = 98;
-                rect.Height = 50;
+            if(sh ==shape_type.rectangel)
+            {
+              rect.Stroke = new SolidColorBrush(Colors.Black);
+              rect.Fill = new SolidColorBrush(Colors.White);
+              rect.Width = 98;
+              rect.Height = 50;
 
-                Canvas.SetLeft(rect, left);
-                Canvas.SetTop(rect, top);
-                Canvas.SetZIndex(rect, 50);
-            //}
-            //else
-            //{
-            //    circle.Stroke = new SolidColorBrush(Colors.Black);
-            //    circle.Fill = new SolidColorBrush(Colors.White);
-            //    circle.Width = 98;
-            //    circle.Height = 50;
+              Canvas.SetLeft(rect, left);
+              Canvas.SetTop(rect, top);
+              Canvas.SetZIndex(rect, 50);
+            }
+            else
+            {
+                circle.Stroke = new SolidColorBrush(Colors.Black);
+                circle.Fill = new SolidColorBrush(Colors.White);
+                circle.Width = 98;
+                circle.Height = 50;
 
-            //    Canvas.SetLeft(circle, left);
-            //    Canvas.SetTop(circle, top);
-            //    Canvas.SetZIndex(circle, 50);
-            //}
+                Canvas.SetLeft(circle, left);
+                Canvas.SetTop(circle, top);
+                Canvas.SetZIndex(circle, 50);
+            }
             visted = true;
 
            
