@@ -523,10 +523,16 @@ namespace Tiny
             }
             try
             {
+                syntax_canvas.Children.Clear();
+
                 tree += "<amr><node type = \"start\" >";
                 parse();
                 tree += "</node></amr>";
                 Draw_Click();
+
+                temp_factor = "";
+                tree = "";
+                index = 0;
             }
             catch (Exception)
             {
@@ -737,6 +743,9 @@ namespace Tiny
                     index++;
                     stmt_equence();
                     break;
+                case "end":
+                    return;
+                    break;
                 default:
                     Match_assign();
                     break;
@@ -744,12 +753,13 @@ namespace Tiny
         }
 
         //function for the if condition
-        private void Match_if()//
+        private void Match_if()//tested
         {
             tree += "<node type=\"if\" >";
             index++;
             tree += "<node type=\"condition\" >";
             Match_expression();
+            tree += "</node>";
 
             //now we expect then
             if (tokken_List[index] == "then")
@@ -758,24 +768,28 @@ namespace Tiny
                 index++;
                 stmt_equence();
                 tree += "</node>";
-                tree += "</node>";
+                //tree += "</node>";
 
                 //now we excpect else or end
-                if (tokken_List[index] == "else" || tokken_List[index] == "end")
+                if (tokken_List[index-1] == "else" || tokken_List[index] == "end")
                 {
-                    if (tokken_List[index]== "else")
+                    if (tokken_List[index-1]== "else")
                     {
                         tree += "<node type=\"else\" >";
-                        index++;
                         stmt_equence();
                         tree += "</node>";
+                        if (tokken_List[index] == "end")
+                        {
+                            index++;
+                            tree += "</node>";
+                            stmt_equence();
+                        }
                     }
-                    if (tokken_List[index] == "end")
+                    else if (tokken_List[index] == "end")
                     {
                         index++;
                         tree += "</node>";
-                        tree += "</node>";
-
+                        stmt_equence();
                     }
                 }
                 else
@@ -805,7 +819,10 @@ namespace Tiny
                 Match_expression();
                 tree += "</node>";
 
-           //     tree += "</node>";
+                index++;
+                stmt_equence();
+
+                //     tree += "</node>";
             }
             else
             {
@@ -827,6 +844,10 @@ namespace Tiny
             tree += "<node type=\"write\" >";
             index++;
             Match_expression();
+
+            index++;
+            stmt_equence();
+
         }
 
         private void Match_assign()//tested
@@ -842,15 +863,20 @@ namespace Tiny
                 Match_expression();
                 //index = index + 2;//must be 1
 
-                 if (tokken_List[index] == "semi col")
-                 {
+                if (tokken_List[index] == "semi col")
+                {
                     index++;
                     stmt_equence();
-                 }
-          }
+                }
+            }
             else
             {
-                if (tokken_List[index] == "semi col") return;
+                if (tokken_List[index] == "semi col")
+                {
+                    index++;
+                    stmt_equence();
+                }
+                //return;
                 //MessageBox.Show("error at " + index);
             }
         }
@@ -889,16 +915,23 @@ namespace Tiny
             #endregion
             if (tokken_List[index] != "semi col")
             {
-                was_exp = false;
-                Match_expression();
-                tree += "</node>"; //of plus | minus | ...
+                if (tokken_List[index] != "then")
+                {
+                    was_exp = false;
+                    Match_expression();
+                    tree += "</node>"; //of plus | minus | ...
+                }
+                else
+                {
+                    tree += temp_factor;
+                }
             }
-            else if (tokken_List[index] == "semi col" )
+            else if (tokken_List[index] == "semi col"  || tokken_List[index] == "then")
             {
                 tree += temp_factor;
                 tree += "</node>";//of assign
                 //index++;
-                //stmt_equence();
+               // stmt_equence();
             }
         }
         private void Match_term()
@@ -1532,6 +1565,66 @@ namespace Tiny
             t.Left += 100;
             syntax_canvas.Margin = t;
         }
+
+
+
+        private void move_top_Click(object sender, RoutedEventArgs e)
+        {
+            Thickness t = syntax_canvas.Margin;
+            t.Top += 100;
+            syntax_canvas.Margin = t;
+        }
+
+        private void move_down_Click(object sender, RoutedEventArgs e)
+        {
+            Thickness t = syntax_canvas.Margin;
+            t.Top -= 100;
+            syntax_canvas.Margin = t;
+        }
+
+
+
+
+
+        //public Point prevScrollPoint;
+        //public double pointX, pointY;
+        //public double offsetX, offsetY;
+
+        //private void syntax_canvas_MouseDown(object sender, MouseButtonEventArgs e)
+        //{
+        //    if (e.LeftButton == MouseButtonState.Pressed)
+        //    {
+        //        prevScrollPoint = e.GetPosition(syntax_canvas);
+        //    }
+
+        //}
+
+        //private void syntax_canvas_MouseMove(object sender, MouseEventArgs e)
+        //{
+        //    if (e.LeftButton == MouseButtonState.Pressed)
+        //    {
+        //        //new code
+        //        offsetX = e.GetPosition(syntax_canvas).X - prevScrollPoint.X;
+        //        offsetY = e.GetPosition(syntax_canvas).Y - prevScrollPoint.Y;
+
+        //        pointX = -(syntax_canvas.Margin.Left);
+        //        pointY = -(syntax_canvas.Margin.Top);
+
+        //        pointX += -pointX;
+        //        pointY += -pointY;
+
+
+        //        Thickness t = syntax_canvas.Margin;
+        //        t.Left += offsetX;
+        //        t.Right += offsetY;
+        //        syntax_canvas.Margin = t;
+
+        //        //this.AutoScrollPosition = new Point(pointX, pointY);
+
+        //        prevScrollPoint = e.GetPosition(syntax_canvas);
+                
+        //    }
+        //}
     }
 
     class node

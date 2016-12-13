@@ -7,7 +7,11 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" x:Class="Tiny.MainWindow"
         mc:Ignorable="d"
         Title="MainWindow" Height="634.5" Width="706.5">
-    <Grid>
+    <Grid >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="42*"/>
+            <RowDefinition Height="25*"/>
+        </Grid.RowDefinitions>
 
         <RichTextBox x:Name="input"  VerticalScrollBarVisibility="Auto" 
          AcceptsReturn="True" HorizontalAlignment="Left" Height="304" Margin="30,43,0,0"   VerticalAlignment="Top" Width="240" KeyUp="input_KeyUp">
@@ -25,13 +29,19 @@
         <TextBlock x:Name="textBlock_Copy" HorizontalAlignment="Left" Margin="420,25,0,0" TextWrapping="Wrap" Text="Output" VerticalAlignment="Top"/>
         <DataGrid x:Name="myDataGrid"  HorizontalAlignment="Left" Margin="420,43,0,0" VerticalAlignment="Top" Height="304" Width="263"/>
 
-
-        <Canvas x:Name="syntax_canvas"
+        <StackPanel  Grid.Row="1">
+            <!--MouseDown="syntax_canvas_MouseDown" MouseMove="syntax_canvas_MouseMove"-->
+            <Canvas x:Name="syntax_canvas"
                 ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                ScrollViewer.CanContentScroll="True" Margin="51,402,51,18"/>
+                ScrollViewer.CanContentScroll="True" Margin="51,24,51,18" Grid.Row="1"/>
 
-        <Button x:Name="move_right" Height="20" Width="30" Click="move_right_Click" Margin="640,484,28,99" >→</Button>
-        <Button x:Name="move_left" Height="20" Width="30" Margin="16,484,652,99" Click="move_left_Click" >←</Button>
+        </StackPanel>
+       
+        <Button x:Name="move_right" Height="20" Width="30" Click="move_right_Click" Margin="640,106,28,99" Grid.Row="1" >→</Button>
+        <Button x:Name="move_left" Height="20" Width="30" Margin="16,106,652,99" Click="move_left_Click" Grid.Row="1" >←</Button>
+
+        <Button x:Name="move_Down" Height="20" Width="30" Margin="345,195,323,10" Click="move_down_Click" Content="↓" Grid.Row="1" />
+        <Button x:Name="move_Top" Height="20" Width="30" Margin="345,9,323,196" Click="move_top_Click" Content="↑" Grid.Row="1" />
 
         <!--<Button x:Name="Draw" Content="Draw" HorizontalAlignment="Left" Margin="301,327,0,0" VerticalAlignment="Top" Width="74" Click="Draw_Click"/>-->
 
