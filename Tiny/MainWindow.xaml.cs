@@ -82,7 +82,9 @@ namespace Tiny
            special_char.Add("/", "divide");
            special_char.Add("=", "equal");
            special_char.Add("<", "smaller");
-           special_char.Add("(", "left_bracket");
+            special_char.Add(">", "bigger");
+
+            special_char.Add("(", "left_bracket");
            special_char.Add(")", "right_bracket");
           // special_char.Add(";"," semi_col ");
            special_char.Add(":", "assignment");
@@ -418,7 +420,7 @@ namespace Tiny
                     number_variable += input_text[b];
                     if (input_text[b + 1] == ' ' || input_text[b + 1] == '\r' ||
                         input_text[b + 1] == '+' || input_text[b + 1] == '-' || input_text[b + 1] == '*' ||
-                        input_text[b + 1] == '/' || input_text[b + 1] == '=' || input_text[b + 1] == '<' ||
+                        input_text[b + 1] == '/' || input_text[b + 1] == '=' || input_text[b + 1] == '<' || input_text[a + 1] == '>' ||
                         input_text[b + 1] == '(' || input_text[b + 1] == ')' || input_text[b + 1] == ';' ||
                        (input_text[b + 1] == ':')&&(input_text[b + 2] == '='))
                     {
@@ -523,8 +525,6 @@ namespace Tiny
             }
             try
             {
-                syntax_canvas.Children.Clear();
-
                 tree += "<amr><node type = \"start\" >";
                 parse();
                 tree += "</node></amr>";
@@ -540,8 +540,9 @@ namespace Tiny
                 temp_factor = "";
                 tree = "";
                 index = 0;
+
             }
-            
+
 
 
 
@@ -893,7 +894,9 @@ namespace Tiny
 
             if (tokken_List[index] == "plus" || tokken_List[index] == "minus" || tokken_List[index] == "equal" ||
                     tokken_List[index] == "smaller" ||
-                    tokken_List[index] == "bigger")
+                    tokken_List[index] == "bigger" || 
+                    tokken_List[index] == "times" || 
+                    tokken_List[index] == "divide")
             {
                 was_exp = true;
                 tree += "<node type=\""+ tokken_List[index] + "\" shape=\"circle\" >" + temp_factor;
@@ -947,7 +950,35 @@ namespace Tiny
             else
             {
             }
+            //    if (tokken_List[index] == "times")
+            //    {
+            //        was_exp = true;
+            //        tree += "<node type=\"" + tokken_List[index] + "\" shape=\"circle\" >" + temp_factor;
+            //        index++;
+            //        Match_term();
+            //    }
+
+            //    if (tokken_List[index] != "semi col")
+            //    {
+            //        if (tokken_List[index] != "then")
+            //        {
+            //            was_exp = false;
+            //            Match_expression();
+            //            tree += "</node>"; //of plus | minus | ...
+            //        }
+            //        else
+            //        {
+            //            tree += temp_factor;
+            //        }
+            //    }
+            //    else if (tokken_List[index] == "semi col" || tokken_List[index] == "then")
+            //    {
+            //        tree += temp_factor;
+            //        tree += "</node>";//of assign
+            //    }
         }
+
+
         private void Match_factor()
         {
             if (tokken_List[index] == "left_bracket")
@@ -1622,7 +1653,7 @@ namespace Tiny
         //        //this.AutoScrollPosition = new Point(pointX, pointY);
 
         //        prevScrollPoint = e.GetPosition(syntax_canvas);
-                
+
         //    }
         //}
     }

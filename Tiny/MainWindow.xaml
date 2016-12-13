@@ -33,7 +33,7 @@
             <!--MouseDown="syntax_canvas_MouseDown" MouseMove="syntax_canvas_MouseMove"-->
             <Canvas x:Name="syntax_canvas"
                 ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                ScrollViewer.CanContentScroll="True" Margin="51,24,51,18" Grid.Row="1"/>
+                ScrollViewer.CanContentScroll="True" Margin="51,24,51,18" Grid.Row="1" Background="White"/>
 
         </StackPanel>
        
