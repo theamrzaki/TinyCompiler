@@ -10,6 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -46,9 +47,7 @@ namespace Tiny
             comment,
             number
         };
-
         
-
         public MainWindow()
         {
             InitializeComponent();
@@ -525,6 +524,10 @@ namespace Tiny
             }
             try
             {
+                syntax_canvas.Children.Clear();
+
+                nodes = new HashSet<node>();
+
                 tree += "<amr><node type = \"start\" >";
                 parse();
                 tree += "</node></amr>";
@@ -533,8 +536,11 @@ namespace Tiny
                 temp_factor = "";
                 tree = "";
                 index = 0;
+                tokken_List.Clear() ;
+                //nodes = new HashSet<node>();
+
             }
-            catch (Exception)
+            catch (Exception ggggg)
             {
                 MessageBox.Show("please put a semi col... error was in "+ index);
                 temp_factor = "";
@@ -593,8 +599,7 @@ namespace Tiny
             //}
 
         }
-
-
+        
         List<string> tokken_List = new List<string>();
         private void add_to_data_grid(string t, string v,Color c)
         {
