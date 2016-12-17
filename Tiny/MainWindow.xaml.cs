@@ -528,9 +528,9 @@ namespace Tiny
 
                 nodes = new HashSet<node>();
 
-                tree += "<amr><node type = \"start\" >";
+                tree += "<Parser><node type = \"start\" >";
                 parse();
-                tree += "</node></amr>";
+                tree += "</node></Parser>";
                 Draw_Click();
 
                 temp_factor = "";
@@ -546,6 +546,7 @@ namespace Tiny
                 temp_factor = "";
                 tree = "";
                 index = 0;
+                tokken_List.Clear();
 
             }
 
